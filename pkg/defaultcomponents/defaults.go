@@ -18,6 +18,7 @@ package defaultcomponents
 import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/awsemfexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/awsxrayexporter"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/awsecscontainermetricsreceiver"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componenterror"
 	"go.opentelemetry.io/collector/exporter/fileexporter"
@@ -42,8 +43,9 @@ func Components() (component.Factories, error) {
 		delete(factories.Receivers, k)
 	}
 	factories.Receivers, err = component.MakeReceiverFactoryMap(
-	    prometheusreceiver.NewFactory(),
-	    otlpreceiver.NewFactory(),
+		prometheusreceiver.NewFactory(),
+		otlpreceiver.NewFactory(),
+		awsecscontainermetricsreceiver.NewFactory(),
 	)
 	if err != nil {
 		errs = append(errs, err)
@@ -55,12 +57,12 @@ func Components() (component.Factories, error) {
 	}
 
 	factories.Exporters, err = component.MakeExporterFactoryMap(
-	    awsxrayexporter.NewFactory(),
-	    awsemfexporter.NewFactory(),
-	    prometheusexporter.NewFactory(),
-	    loggingexporter.NewFactory(),
-	    fileexporter.NewFactory(),
-	    otlpexporter.NewFactory(),
+		awsxrayexporter.NewFactory(),
+		awsemfexporter.NewFactory(),
+		prometheusexporter.NewFactory(),
+		loggingexporter.NewFactory(),
+		fileexporter.NewFactory(),
+		otlpexporter.NewFactory(),
 	)
 	if err != nil {
 		errs = append(errs, err)
