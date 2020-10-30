@@ -16,34 +16,24 @@
 package defaultcomponents // import "aws-observability.io/collector/defaultcomponents
 
 import (
-	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/awsemfexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/awsxrayexporter"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/metricstransformprocessor"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/awsecscontainermetricsreceiver"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componenterror"
-	"go.opentelemetry.io/collector/exporter/fileexporter"
-	"go.opentelemetry.io/collector/exporter/loggingexporter"
-	"go.opentelemetry.io/collector/exporter/otlpexporter"
-	"go.opentelemetry.io/collector/exporter/prometheusexporter"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
-	"go.opentelemetry.io/collector/receiver/prometheusreceiver"
-	"go.opentelemetry.io/collector/service/defaultcomponents"
 )
 
 // Components register OTel components for aws-otel-collector distribution
 func Components() (component.Factories, error) {
 	errs := []error{}
-	factories, err := defaultcomponents.Components()
+
+	factories, err := emptyComponents()
 	if err != nil {
-		return component.Factories{}, err
+		errs = append(errs, err)
 	}
 
 	// enable the selected receivers
 	factories.Receivers, err = component.MakeReceiverFactoryMap(
-		prometheusreceiver.NewFactory(),
 		otlpreceiver.NewFactory(),
-		awsecscontainermetricsreceiver.NewFactory(),
 	)
 	if err != nil {
 		errs = append(errs, err)
@@ -51,10 +41,6 @@ func Components() (component.Factories, error) {
 
 	// enable the selected processors
 	processors := []component.ProcessorFactory{
-		metricstransformprocessor.NewFactory(),
-	}
-	for _, pr := range factories.Processors {
-		processors = append(processors, pr)
 	}
 	factories.Processors, err = component.MakeProcessorFactoryMap(processors...)
 	if err != nil {
@@ -64,11 +50,6 @@ func Components() (component.Factories, error) {
 	// enable the selected exporters
 	factories.Exporters, err = component.MakeExporterFactoryMap(
 		awsxrayexporter.NewFactory(),
-		awsemfexporter.NewFactory(),
-		prometheusexporter.NewFactory(),
-		loggingexporter.NewFactory(),
-		fileexporter.NewFactory(),
-		otlpexporter.NewFactory(),
 	)
 	if err != nil {
 		errs = append(errs, err)
@@ -76,3 +57,15 @@ func Components() (component.Factories, error) {
 
 	return factories, componenterror.CombineErrors(errs)
 }
+
+func emptyComponents() (
+	component.Factories,
+	error,
+) {
+	var errs []error
+	factories := component.Factories{
+	}
+	return factories, componenterror.CombineErrors(errs)
+}
+
+
