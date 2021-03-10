@@ -15,13 +15,10 @@
 package config
 
 import (
-	"flag"
 	"github.com/spf13/cobra"
 	"os"
 	"reflect"
 	"testing"
-
-	"go.opentelemetry.io/collector/service/builder"
 
 	"github.com/aws-observability/aws-otel-collector/pkg/defaultcomponents"
 	"github.com/stretchr/testify/assert"
@@ -34,8 +31,6 @@ func TestGetCfgFactoryReturn(t *testing.T) {
 }
 
 func TestGetCfgFactoryWithoutConfig(t *testing.T) {
-	newFlag := flag.NewFlagSet("newFlag", flag.ContinueOnError)
-	builder.Flags(newFlag)
 	v := config.NewViper()
 	cmd := &cobra.Command{}
 	factories, _ := defaultcomponents.Components()
